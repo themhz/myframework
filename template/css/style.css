@@ -1,0 +1,591 @@
+/*------------initialize ----------*/
+/* Είναι γενικές κλάσεις για το σώμα και τους τίτλους H*/
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+
+/*------------css grid declarations ----------*/
+/*Ορισμός του grid container που είναι ουσιαστικά η δομή όλης της σελίδας*/
+
+.grid-container {
+    display: grid;
+    grid-template-areas: 
+    'header header header header' 
+    'nav nav nav nav' 
+    'nav2 body body body' 
+    'login login login login'
+    'footerl footerl footerr footerr';
+    grid-gap: 0px;
+    /*background-color: #2196F3;*/
+    padding: 10px;
+}
+
+/*Τυπική κλάση για τα div που βρίσκνται κάτω από το grid container Και είναι τα div*/
+.grid-container>div {
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 30px;
+}
+
+/*------------Header ----------*/
+/*Εδω είναι η κλάση του head της σελίδας. τυπικά είναι σε όλες τις σελίδες*/
+.head {
+    grid-area: header;
+}
+
+/*Μια κλάση πάλι με χρήση grid για το header*/
+.header-container {
+    display: grid;
+    grid-template-areas: 'headl headm headr';
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-gap: 1px;
+}
+
+
+.header-container>div {
+    background-color: rgba(255, 255, 255, 255);
+    font-size: 30px;
+}
+
+/*<το αριστερό κομάτι της κεφαλίδας. Αυτό συνδέεται με το .header-container και παίρνει την θέση στην δομή headl*/
+.headl {
+    grid-area: headl;
+}
+/*το κεντρικό κομμάτι*/
+.headm {
+    grid-area: headm;
+    text-align: center;
+}
+
+/*Και το δεξί κομμάτι τις κεφαλίδας για το είσοδος*/
+.headr {
+    grid-area: headr;
+    line-height: 30vh;
+    text-align: center;
+    text-decoration: none;    
+    font-size: 0.7em !important;
+}
+
+
+/*------------menu ----------*/
+.nav2 {
+    grid-area: nav2;
+    text-align: center;
+    justify-content: left;
+    display: contents;
+    font-size: 1.6em !important;
+}
+.nav2 ul{
+    display:block;
+    list-style-type: none;
+    padding: 0;
+    
+}
+.nav2 a{
+    text-decoration: none;
+    color: #CE0980;
+}
+
+.nav {
+    grid-area: nav;
+    background-color:#182234 !important;
+}
+.nav-container a{
+    text-decoration: none;
+    color:#CE0980;
+}
+.nav-container {
+    
+    display: grid;
+    grid-template-areas: "mitem";
+    /*padding: 10px;*/
+    grid-gap: 0px;
+}
+
+.mitem{
+    grid-area: mitem;
+}
+
+nav ul {
+    display: flex;
+    
+    justify-content: start;
+    list-style: none;
+    background-color: #182234 !important;
+    grid-gap: 0px!important;
+    padding: 0px;
+    margin: 0px;
+}
+
+nav ul li {
+    /*background-color: crimson;*/
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8em;
+    border: 1px solid;
+}
+
+nav ul li:hover {
+    cursor: pointer;
+    background-color: white;
+    color:#CE0980;
+}
+
+#submenu{
+    display: block;
+    position:absolute;
+    width:24.3vw;
+    margin:10px 0 0 -10px;
+    visibility: hidden;
+    z-index: 1;
+}
+.selected{
+    background-color: white;
+}
+
+/*-----------Body------------*/
+
+.body {
+    grid-area: body;
+    padding-bottom:0px;
+    padding-left: 25px;
+    /*height: 50vh;*/
+}
+.pitem p{
+    text-align: left;
+    padding-top: 0px;
+    margin: 0 50px 50px 50px;
+    font-size: 0.8em;
+    
+}
+.pitem img{  
+    width:100px;
+    float:left;
+    margin:0 50px 50px 50px;
+}
+.pitem h1{
+    text-align: left;
+    margin-left:100px;
+    font-size:0.8em;
+}
+
+.pitemalt p{
+    text-align: right;
+    padding-top: 20px;
+    margin: 0 50px 50px 50px;
+    font-size: 0.8em;
+    
+}
+.pitemalt img{  
+    width:100px;
+    float:right;
+    margin:0 50px 50px 50px;
+}
+
+.pitemalt h1{
+    text-align: right;
+    margin-right:100px;
+    font-size:0.8em;
+}
+
+.allanounces{
+    padding: 30px;
+    text-align: center;
+    font-size:0.8em;
+
+}
+/*------------Footer ----------*/
+
+.footer {
+    grid-area: footer;
+}
+
+.footerl {
+    grid-area: footerl;
+    text-align: center;
+    background-color: grey !important;
+    justify-content: left;
+    display: flex;
+    font-size: 1.6em !important;
+}
+
+.footerl ul li {
+    padding: 0;
+    list-style: none;
+}
+
+.lititle {
+    font-size: 1em !important;
+    font-weight: bold;
+}
+
+.phone, .mail {
+    font-size: 0.7em !important;
+}
+
+.footerr {    
+    grid-area: footerr;
+    text-align: center;
+    background-color: grey !important;
+    font-size: 1em !important;
+    justify-content: flex-end;
+    display: flex;
+    padding-right: 100px;
+    line-height: 6vw;    
+}
+
+.footerr ul li {
+    display: inline;
+}
+
+/********table*********/
+#table {
+    /*width:98vw;*/
+    margin-top: 20;
+    margin-bottom: 30px;
+    grid-area: body;    
+    
+    display: grid;
+    border-collapse: collapse;
+    
+    min-width: 100%;
+    grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr        
+;
+}
+#table thead, #table tbody, #table tr {
+  
+  border:1px solid black;  
+  border-collapse: collapse;  
+  color: blue!important;
+}
+
+#table tbody tr:hover{
+    cursor: pointer;
+    background-color:#808080;
+}
+
+
+#table th {
+    
+  padding: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border:1px solid black;
+  z-index: 0;
+  position: sticky;
+  top: 0;
+  background:grey;
+  text-align: center;
+  font-weight: normal; 
+  font-size: 1.1rem;
+  color: white;
+  border: 1px solid black;
+}
+
+#table td{
+  padding: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border:1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color:#CE0980;
+}    
+  
+.spaner1{
+grid-row: span 1;
+text-align: center;
+
+}
+.spaner2{
+grid-row: span 2;
+text-align: center;
+
+}
+.spaner3{
+grid-row: span 3;    
+display: flex;
+justify-content: center;
+align-items: center;
+
+}
+.spaner4{
+grid-row: span 4;  
+display: flex;
+justify-content: center;
+align-items: center;
+
+}
+
+  /******* Prosopiko table ********/
+
+#prosopikotbl {    
+    margin-top: 20;
+    margin-bottom: 50px;
+    grid-area: body;
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    grid-template-columns:  1fr 1fr 1fr 1fr 1fr;
+}
+
+#prosopikotbl thead, #prosopikotbl tbody, #prosopikotbl tr {    
+    display: contents;    
+    position: relative;
+    font-size: 0.9em;
+    line-height: normal;
+    /*line-height: 100px;*/
+    color: blue;
+}
+
+#prosopikotbl img{
+    padding:10px;
+}
+#prosopikotbl td{    
+    border-bottom: 1px solid black;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center{
+    text-align: center;
+}
+
+#prosopikotbl tbody>tr>:nth-child(2){
+    text-decoration: underline;
+}
+
+/******* kanonismos ********/
+.pkanonismos{
+    padding: 1%;
+    font-size: 0.6em;
+}
+
+
+/****** peisodos **********/
+.peisodos{
+    padding: 1%;
+    font-size: 0.6em;
+}
+
+
+.login{
+    border-collapse: collapse;
+    /* border:1px solid red; */
+    display: grid;
+    grid-area: login;        
+    grid-template-columns: 1fr 1fr ;    
+}
+
+.login tr{    
+    display: flex;
+    justify-content: center;
+}
+
+
+.login td{    
+    display: grid;
+    grid-area: login;            
+    width: 100px;
+}
+
+
+.login button {    
+    background-color:#CE0980;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+
+    display: flex;
+    grid-area: login;
+    
+    
+    
+    justify-content: center;
+
+}
+
+
+.login tr:nth-child(1){
+    line-height: 30px;
+}
+
+.login tr:nth-child(2){
+    line-height: 30px;
+}
+
+/*****************Didaskontes**********************/
+
+#gramateia {    
+    margin-top: 20;
+    margin-bottom: 50px;
+    grid-area: body;
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    grid-template-columns:  1fr 1fr 1fr 1fr;
+}
+
+
+
+
+#gramateia thead, #gramateia tbody, #gramateia tr {    
+    display: contents;    
+    position: relative;
+    font-size: 0.9em;
+    line-height: normal;
+    /*line-height: 100px;*/
+    color: blue;
+}
+
+#gramateia img{
+    padding:10px;
+}
+#gramateia td{    
+    border-bottom: 1px solid black;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center{
+    text-align: center;
+}
+
+#gramateia tbody>tr>:nth-child(2){
+    text-decoration: underline;
+}
+
+.anakoinwsh{
+    font-size:0.8em;
+}
+
+.anakoinwsh img{
+    width: 100px;   
+    float:left;
+    margin:50px;
+}
+
+#users tr:hover{
+    cursor: pointer;
+    background-color: #CE0980!important;
+}
+
+
+/**************MODAL CODE Από :https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_modal2********************/
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 15%; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 40%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+  }
+  
+  /* Add Animation */
+  @-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+  }
+  
+  @keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+  }
+  
+  /* The Close Button */
+  .close {
+    
+    float: right;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 10px;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    
+  }
+  
+  .modal-body {padding: 2px 16px;}
+  
+  .modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    
+  }
+
+  .modal-frame{
+    padding: 20px;
+    border: 2px solid #182234;
+  }
+
+  .modal-frame input, select, textarea{
+      width:300px;
+  }
+
+  .minitable{
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .minitable tr{
+      border:1px solid black;
+  }
+  .minitable td,th{
+      border-right: 1px solid black;
+  }
