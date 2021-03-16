@@ -85,24 +85,24 @@
             var deleteconfirmmsg = "Είστε σίγουρος ότι θέλετε να διαγράψετε τον μαθητή?";
             var popupwindow = "myModal";
             var newbutton = "btnNewUser";
-            var closepopupbutton = "closepopup";                                
-            tablehandler = new TableHandler(tableid, getAllUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton);
-            tablehandler.loadtable();
-
-
-            var fields = [{id: "name", type: "textbox", required : true}
-                          ,{id: "lastname", type: "textbox", required : true}
-                          ,{id: "email", type: "email", required : true}
-                          ,{id: "password", type: "password", required : true}
-                          ,{id: "role", type: "multiselect", required : true}
-                          ,{id: "mobilephone", type: "phone", required : false}
-                          ,{id: "address", type: "textbox", required : false}
-                          ,{id: "birthdate", type: "date", required : false}
-                          ,{id: "regdate", type: "date", required : true}
-                          ,{id: "am", type: "textbox", required : false}
-                        ];
-            formValidator =  new FrormValidator(fields);
-            formValidator.validate();
+            var closepopupbutton = "closepopup";         
+            var clickrowForPopup = function(){
+               var fields = [{id: "name", type: "textbox", required : true}
+                              ,{id: "lastname", type: "textbox", required : true}
+                              ,{id: "email", type: "email", required : true}
+                              ,{id: "password", type: "password", required : true}
+                              ,{id: "role", type: "select", required : true}
+                              ,{id: "mobilephone", type: "phone", required : false}
+                              ,{id: "address", type: "textbox", required : false}
+                              ,{id: "birthdate", type: "date", required : false}
+                              ,{id: "regdate", type: "date", required : false}
+                              ,{id: "am", type: "textbox", required : false}
+                              ];
+                     formValidator =  new FrormValidator(fields);
+                     return formValidator.validate();
+            };              
+            tablehandler = new TableHandler(tableid, getAllUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clickrowForPopup);
+            tablehandler.loadtable();            
 
         }
     }, false);

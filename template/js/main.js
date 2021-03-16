@@ -13,7 +13,7 @@ function hidemenu(){
 //3.
 class TableHandler{
     //Ο Constructor της κάσης tablehandler για να αρχικοποιήσει την βασικές μεταβλητές
-    constructor(tableid, getallUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton){
+    constructor(tableid, getallUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clickrowForPopup){
         
         this.tableid = tableid; //Το id του πίνακα που θα τοποθετηθούν τα δεδομένα
         this.getallUrl = getallUrl; //Το url που θα χρησιμοποιηθεί για να φορτοθούν τα δεδομένα από το endpoint της php
@@ -28,7 +28,7 @@ class TableHandler{
         this.popupwindow = popupwindow;//το id του popup
         this.newbutton = newbutton;//το id του new κουμπιού        
         this.closepopupbutton = closepopupbutton;
-
+        this.clickrowForPopup = clickrowForPopup;
         // Get the modal
         var modal = document.getElementById(this.popupwindow);
 
@@ -71,7 +71,7 @@ class TableHandler{
     }
 
     //Η συνάρτηση ajax call για να γίνει η κλήση στο endpoint και να φορτωθούν τα δεδομένα στον πίνακα
-    loadtable() {
+    loadtable(callbackfunc) {
 
         this.cleanTable(); //Καθαρίζει τον πίνακα
         var xhttp = new XMLHttpRequest(); // Δημιουργεί ένα object XMLHttpRequest 
@@ -90,16 +90,21 @@ class TableHandler{
             // 404: "Page not found"            
             //https://www.w3schools.com/xml/ajax_xmlhttprequest_response.asp
 
-            if (this.readyState == 4 && this.status == 200) {
+            if (this.readyState == 4 && this.status == 200) {                                
                 var response = eval('(' + this.responseText + ')'); //Στάνταρ λειτουργία για να μετασχηματίσουμε το αποτέλεσμα που παίρνουμε από τον server σε JSON
 
                 self.pupulatedropdowns(response.relations); // Λειτουργία για να ενημερώσουμε τα dropdown του popup μια φορά
                 self.addrows(response.data, self.rows);     // Εισαγωγή των γραμμών - αποτελεσμάτων στον πίνακα           
+                if(callbackfunc!=null){
+                    eval(callbackfunc).call();
+                }
             }
         };
         
         xhttp.open("get", this.getallUrl, true); //Προετιμασία της αποστολής δηλώνοντας την μέθοδο το url και τρίτη παράμετρος ότι είναι ασύγχρονη αποστολή.
         xhttp.send(); //Τελική αποστολή των δεδομένων στο endpoint. μετά από εδώ ο κώδικας θα μεταφερθεί στην γραμμή 51 που είναι το promise. Δηλαδή μόλις ολοκληρωθεί
+
+        return xhttp
     }
    
     //Μια απλή συναρτησούλα :P για να κάνει καταχώρηση των δεδομένων στον πίνακα. Τυπικά παίρνει παράμετρο ένα jason και το βάζει στον πίνακα
@@ -330,20 +335,21 @@ class TableHandler{
 
     //Ένας μηχανίσμός για να ελέγχουμε πότε κάνουμε update και πότε insert κάτω από το ίδιο κουμπί
     save() {
-      
-        if (actionType == "update") {         
-           tablehandler.update();
-           tablehandler.loadtable(); 
-           document.getElementById(this.popupwindow).style.display = "none";         
-  
-        } else if (actionType == "insert") {
-           tablehandler.insert();
-           tablehandler.loadtable(); 
-           document.getElementById(this.popupwindow).style.display = "none";         
-        } else {
-  
-        }
-          
+        //{canSubmit : canSubmit, fields : errorFields};
+        if(this.clickrowForPopup.call().canSubmit){
+            if (actionType == "update") {         
+                tablehandler.update();
+                tablehandler.loadtable(); 
+                document.getElementById(this.popupwindow).style.display = "none";         
+       
+             } else if (actionType == "insert") {
+                tablehandler.insert();
+                tablehandler.loadtable(); 
+                document.getElementById(this.popupwindow).style.display = "none";         
+             } else {
+       
+             }
+        }                  
     }
 
     //Όταν εκτελείται για πρώτη φορά η loadtable θα φορτώσει τον πίνακα. Επειδή όμως χρησιμοποιώ και μια φόρμα για κάθε ένα click που γίνεται χρησιμοποιώ έναν μηχανισμό για να ξέρω
@@ -382,7 +388,7 @@ class FrormValidator{
         
         var errorFields = {};
         for(var i=0;i<this.fields.length;i++){
-            //console.log(this.fields[i]);
+
             switch(this.fields[i].type) {
                 case "textbox":
                     if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
@@ -437,13 +443,25 @@ class FrormValidator{
                     // code block
                     break;
                 case "select":
-                    // code block
+                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                        document.getElementById(this.fields[i].id).style = "background-color:red";
+                        errorFields[this.fields[i].id] = this.fields[i].id + " is required";
+                    }else{
+                        //check if its in date format ????ΕΔΩ ΕΙΜΑΣΤΕ
+                        document.getElementById(this.fields[i].id).style = "background-color:none;";
+                    }
                     break;
                 case "multiselect":
                     // code block
                     break;
                 case "email":
-                    // code block
+                    if(this.fields[i].required && !this.isemail(document.getElementById(this.fields[i].id).value)){
+                        document.getElementById(this.fields[i].id).style = "background-color:red";
+                        errorFields[this.fields[i].id] = this.fields[i].id + " is required";
+                    }else{                        
+                        document.getElementById(this.fields[i].id).style = "background-color:none;";
+                    }
+
                     break;
                 case "phone":
                     // code block
@@ -453,8 +471,12 @@ class FrormValidator{
               }
         }
 
-        console.log(errorFields );
-        return false;
+        var canSubmit = true;
+        //console.log(Object.keys(errorFields).length);
+        if(Object.keys(errorFields).length>0){
+            canSubmit = false;
+        }
+        return {canSubmit : canSubmit, fields : errorFields};
     }
 
     isemail(x) 
@@ -463,7 +485,7 @@ class FrormValidator{
         {
             return (true)
         }
-        alert("You have entered an invalid email address!")
+        //alert("You have entered an invalid email address!")
         return (false)
     }
 }
