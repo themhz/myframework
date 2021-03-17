@@ -11,165 +11,124 @@
 <div id="myModal" class="modal">
    <!-- Modal content -->
    <div class="modal-content">
-      <span class="close">X</span>
+      <span id="closepopup" class="close">X</span>
       <div class="modal-frame">
-         «Μαθήματα που έχουν δηλωθεί», <br>
-         «Βασικά Μαθήματα με προβιβάσιμο βαθμό», <br>
-         «Μαθήματα Επιλογής με προβιβάσιμο βαθμό», <br>
-         <table id="courses" class="minitable"><tbody></tbody></table>
-         «Διδακτικές Μονάδες», <lable id="ects"></lable><br>
-         «Βασικά Μαθήματα για πτυχίο», <br>
-         <table id="remainingenrolementsbasic" class="minitable"><tbody></tbody></table>
-         «Μαθήματα Επιλογής για πτυχίο», <br>
-         <table id="remainingenrolementschoice" class="minitable"><tbody></tbody></table>
-         «Διδακτικές Μονάδες για πτυχίο» <lable id="maxects"></lable><br>
+         Μαθήματα που έχουν δηλωθεί <br>
+         <table id="EnrolledCourses" class="minitable"><tbody></tbody></table><br>
          
+         Βασικά Μαθήματα με προβιβάσιμο βαθμό <br>
+         <table id="BasicEnrolledCoursesWithPassGrade" class="minitable"><tbody></tbody></table><br>
+         
+         Μαθήματα Επιλογής με προβιβάσιμο βαθμό <br>
+         <table id="OptionalEnrolledCoursesWithPassGrade" class="minitable"><tbody></tbody></table><br>
+         
+         Βασικά Μαθήματα για πτυχίο <br>
+         <table id="BasicCoursesforDegree" class="minitable"><tbody></tbody></table><br>                  
+
+         Μαθήματα Επιλογής για πτυχίο <br>
+         <table id="OptionCoursesforDegree" class="minitable"><tbody></tbody></table><br>
+
+         Διδακτικές Μονάδες για πτυχίο: <lable id="ectsforgraduation"></lable><br>
+         Διδακτικές Μονάδες: <lable id="ectsgathered"></lable><br>         
       </div>
    </div>
-
 </div>
 
 <script>
    //Το load της σελίδας για να φορτώσει το ajax
    var actionType;
-   var gid;
-   let th = new TableHandler();
+   var gid;         
+   var tablehandler;
+
    document.addEventListener('readystatechange', function(evt) {
-      if (evt.target.readyState == "complete") {
-         filltable();
+        if(evt.target.readyState == "complete"){                           
+            var tableid = "table";
+            var getAllUrl = "/myframework/studentprogress/select?format=raw"; 
+            var rows = ["id", "name", "email", "am", "lessons", "semester", "regdate"]; 
+            var getItemUrl= null; 
+            var deleteUrl = null;
+            var updateUrl = null;
+            var insertUrl = null;
+            var deleteconfirmmsg = null;
+            var popupwindow = "myModal";
+            var newbutton = null;            
+            var closepopupbutton = "closepopup";                                 
+            var clicksaveForPopup = null;
+            var onOpenPopup = function(id){
+                              
+                  var xhttp = new XMLHttpRequest(); // Δημιουργεί ένα object XMLHttpRequest                
+                  xhttp.onreadystatechange = function() { //Ένα promise ώστε όταν επιστρέχει το αποτέλεσμα από τον server να εκτελεστεί η παρακάτω ανώμυμη συνάρτηση.                      
 
-         //Εδώ έχουμε τον κώδικα του popup 
+                     if (this.readyState == 4 && this.status == 200) {
+                        var response = eval('(' + this.responseText + ')'); //Στάνταρ λειτουργία για να μετασχηματίσουμε το αποτέλεσμα που παίρνουμε από τον server σε JSON
+                        for(i=0; i<response.length; i++){                           
+                           
+                           switch(Object.keys(response[i])[0]) {
+                              case "EnrolledCourses":
+                                 createTable("EnrolledCourses", Object.values(response[i])[0]);
+                                 break;
+                              case "BasicEnrolledCoursesWithPassGrade":
+                                 createTable("BasicEnrolledCoursesWithPassGrade", Object.values(response[i])[0]);
+                                 break;
+                              case "OptionalEnrolledCoursesWithPassGrade":
+                                 createTable("OptionalEnrolledCoursesWithPassGrade", Object.values(response[i])[0]);
+                                 break;                              
+                              case "BasicCoursesforDegree":
+                                 createTable("BasicCoursesforDegree", Object.values(response[i])[0]);
+                                 break;
+                              case "OptionCoursesforDegree":
+                                 createTable("OptionCoursesforDegree", Object.values(response[i])[0]);
+                                 break;
+                              case "Ectsforgraduation":                                 
+                                 document.getElementById("ectsforgraduation").innerHTML = Object.values(response[i])[0][0].ects;                                 
+                                 break;
+                              case "EctsGathered":                                 
+                                 document.getElementById("ectsgathered").innerHTML = Object.values(response[i])[0][0].ects;
+                                 break;
+                              default:
+                               
+                              }                           
+                        }                        
+                     }
+                  };
 
-         // Get the modal
-         var modal = document.getElementById("myModal");
+                  xhttp.open("POST", "/myframework/studentprogress/getstatisticdata?format=raw", true); //Προετιμασία της αποστολής δηλώνοντας την μέθοδο το url και τρίτη παράμετρος ότι είναι ασύγχρονη αποστολή.
+                  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                  xhttp.send(JSON.stringify({"id": id}));
+        
+                  
 
-
-         // Get the <span> element that closes the modal
-         var span = document.getElementsByClassName("close")[0];
-
-
-         // When the user clicks on <span> (x), close the modal
-         span.onclick = function() {
-
-            modal.style.display = "none";
-         }
-         //για να πιάνει το escape event
-         document.onkeydown = function(evt) {
-            evt = evt || window.event;
-            var isEscape = false;
-            if ("key" in evt) {
-               isEscape = (evt.key === "Escape" || evt.key === "Esc");
-            } else {
-               isEscape = (evt.keyCode === 27);
             }
-            if (isEscape) {
-               //alert("Escape");
-               var modal = document.getElementById("myModal");
-               modal.style.display = "none";
+            tablehandler = new TableHandler(tableid, getAllUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clicksaveForPopup, onOpenPopup);
+            tablehandler.loadtable();
 
-            }
-         };
+        }
+    }, false);
+     
 
-      }
-   }, false);
-
-
-   //Η συνάρτηση ajax call για να γίνει η κλήση στο endpoint
-   function filltable() {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-            var response = eval('(' + this.responseText + ')');
-            th.addtablerows(response.data, ["id", "name", "email", "regdate", "am","lessons","semester"], "table", "myModal", "selectitem(this.cells[0].innerHTML);");
+     function createTable(id, values){        
+         var table =  document.getElementById(id).getElementsByTagName('tbody')[0];        
+         for (var i = table.rows.length - 1; i >= 0; i--) { //για κάθε μια γραμμή
+            table.deleteRow(i);// την διαγράφει
          }
-      };
-      xhttp.open("get", "/myframework/studentprogress/select?format=raw", true);
-      xhttp.send();
-   }
-
-   //Για το drop down των καθηγητών
-   //Η συνάρτηση ajax call για να γίνει η κλήση στο endpoint
-   function selectitem(id) {
-
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-            var response = eval('(' + this.responseText + ')');
-            //response = response.data[0];
-            th.addtablerows(response.data, ["id", "title", "description", "grade", "type", "ects"], "courses", null, null);
-
-            var table = document.getElementById("courses");
-            //alert(table.rows.length-1);
-            var sum=0; //Μεταβλιτή για να μετρήσουμε τις διδακτικές μονάδες
-            for(var i=1;i<table.rows.length;i++){ //λουπα για να μετρήσουμε τις διδακτικές μονάδες
-               //console.log(table.rows[i].cells[5].innerHTML)
-               sum += parseInt(table.rows[i].cells[5].innerHTML);
-            }
-            document.getElementById("ects").innerHTML=sum;
-
-            getRemainingenrolementsbasic(id);
-         }
-      };
-      xhttp.open("POST", "/myframework/studentprogress/getentrolements?format=raw", true);
-      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhttp.send(JSON.stringify({
-         "id": id
-      }));
-   }
-
-   var totalectssum=0;
-   function getRemainingenrolementsbasic(id){
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-            var response = eval('(' + this.responseText + ')');
-            //response = response.data[0];
-            th.addtablerows(response.data, ["id", "title", "description", "type", "ects"], "remainingenrolementsbasic", null, null);
-
-            let table = document.getElementById("remainingenrolementsbasic");            
-                        
-            for(var i=1;i<table.rows.length;i++){ //λουπα για να μετρήσουμε τις διδακτικές μονάδες     
-               if(table.rows[i].cells[4]!= undefined && table.rows[i].cells[4]!=""){
-                  totalectssum += parseInt(table.rows[i].cells[4].innerHTML);
-                  //console.log(totalectssum);
-               }                                             
-            }            
-            getRemainingenrolementschoice(id);
-         }
-      };
-      xhttp.open("POST", "/myframework/studentprogress/remainingenrolements?format=raw", true);
-      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhttp.send(JSON.stringify({
-         "id": id,
-         "type": 1
-      }));
-   }
-
-   function getRemainingenrolementschoice(id){
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-            var response = eval('(' + this.responseText + ')');
-            //response = response.data[0];
-            th.addtablerows(response.data, ["id", "title", "description", "type", "ects"], "remainingenrolementschoice", null, null);
-
-            var table = document.getElementById("remainingenrolementschoice");            
-            for(var i=1;i<table.rows.length;i++){ //λουπα για να μετρήσουμε τις διδακτικές μονάδες
-               if(table.rows[i].cells[4]!= undefined && table.rows[i].cells[4]!=""){
-                  totalectssum += parseInt(table.rows[i].cells[4].innerHTML);
+         
+         var hc =0; //metriths gia to header
+         for(var i=0; i<values.length ; i++){
+            var head = table.insertRow();
+            if(hc == 0){
+               for( var j=0; j<Object.keys(values[i]).length ; j++){               
+                  var cell = head.insertCell();
+                  cell.innerHTML = Object.keys(values[i])[j];
+                  hc++;
                }
-            }
-            document.getElementById("maxects").innerHTML=totalectssum;
-            
-         }
-      };
-      xhttp.open("POST", "/myframework/studentprogress/remainingenrolements?format=raw", true);
-      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhttp.send(JSON.stringify({
-         "id": id,
-         "type": 2
-      }));
-   }
+            }            
 
-   
+            var row = table.insertRow();
+
+            for( var j=0; j<Object.keys(values[i]).length ; j++){
+               var cell = row.insertCell();
+               cell.innerHTML = Object.values(values[i])[j];               
+            }            
+         }
+     }
 </script>

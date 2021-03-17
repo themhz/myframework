@@ -16,14 +16,14 @@ class Courses
                         a.title,
                         a.description,
                         c.name as 'type',
-                        c.id as 'typeid',
+                        c.id as 'courses_type',
                         a.semester,
                         a.ects,
                         Concat(b.name ,\" \", b.lastname) as professorname,
-                        b.id as professorid
+                        b.id as users
                         from courses a
-                        inner join users b on a.user_id = b.id
-                        inner join coursetypes c on a.type = c.id                        
+                        inner join users b on a.users = b.id
+                        inner join courses_type c on a.courses_type = c.id                        
                     ";
 
                 if(requestHandler::get()!=null){
@@ -42,11 +42,11 @@ class Courses
                 'title' => $row->title,
                 'description' => $row->description,
                 'type' => $row->type,
-                'typeid' => $row->typeid,
+                'courses_type' => $row->courses_type,
                 'semester' => $row->semester,
                 'ects' => $row->ects,
                 'professorname' => $row->professorname,
-                'professorid' => $row->professorid
+                'users' => $row->users
             );
         }
 
@@ -72,14 +72,14 @@ class Courses
     {
         $db = dbhandler::getInstance();
         $sql = "update courses "
-            . " set user_id=:user_id, title=:title, type=:type, description=:description, semester=:semester, ects=:ects "
+            . " set users=:users, title=:title, courses_type=:courses_type, description=:description, semester=:semester, ects=:ects "
             . " where id=:id";
 
         $sth = $db->dbh->prepare($sql);
         $sth->execute(array(
-            ':user_id' => $obj->user_id,
+            ':users' => $obj->users,
             ':title' => $obj->title,
-            ':type' => $obj->type,
+            ':courses_type' => $obj->courses_type,
             ':description' => $obj->description,
             ':semester' => $obj->semester,
             ':ects' => $obj->ects,
@@ -99,14 +99,14 @@ class Courses
     {
         $db = dbhandler::getInstance();
         $sql = "insert courses "
-            . "(user_id, title, type, description, semester,ects) "
-            . "values(:user_id, :title, :type, :description, :semester, :ects); ";
+            . "(users, title, courses_type, description, semester, ects) "
+            . "values(:users, :title, :courses_type, :description, :semester, :ects); ";
 
         $sth = $db->dbh->prepare($sql);
         $sth->execute(array(
-            ':user_id' => $students->user_id,
+            ':users' => $students->users,
             ':title' => $students->title,
-            ':type' => $students->type,
+            ':courses_type' => $students->courses_type,
             ':description' => $students->description,
             ':semester' => $students->semester,
             ':ects' => $students->ects
@@ -115,4 +115,36 @@ class Courses
         return array('insert'=>false, "records"=>$db->dbh->lastInsertId());
         
     }
+
+    
+    public function getRelations(){
+        
+        $db = dbhandler::getInstance();
+        $dbname = Config::read('db.basename');
+        $sql = "SELECT *  FROM information_schema.key_column_usage where constraint_schema = '$dbname' and table_name='courses' and REFERENCED_TABLE_NAME is not null";
+                        
+            
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_OBJ);
+                
+        foreach ($results as $row) {            
+            $sql = "SELECT *  FROM ".$row->REFERENCED_TABLE_NAME;
+              if($row->REFERENCED_TABLE_NAME=="users"){
+                  $sql .=" where role = 2 ";
+              }
+            $sth = $db->dbh->prepare($sql);
+            $sth->execute();
+            $results = $sth->fetchAll(PDO::FETCH_ASSOC);
+            $data[$row->REFERENCED_TABLE_NAME][] = $results;
+                // $data[] = array(
+                // 'COLUMN_NAME' => $row->COLUMN_NAME,                                
+                // 'REFERENCED_TABLE_NAME' => $row->REFERENCED_TABLE_NAME,
+                // 'REFERENCED_COLUMN_NAME' => $row->REFERENCED_COLUMN_NAME
+                // );
+        }
+
+        return $data;
+    }
+    
 }

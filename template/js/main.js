@@ -13,7 +13,8 @@ function hidemenu(){
 //3.
 class TableHandler{
     //Ο Constructor της κάσης tablehandler για να αρχικοποιήσει την βασικές μεταβλητές
-    constructor(tableid, getallUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clickrowForPopup){
+   
+    constructor(tableid, getallUrl, rows, getItemUrl=null, deleteUrl=null, updateUrl=null, insertUrl=null, deleteconfirmmsg=null, popupwindow=null, newbutton=null, closepopupbutton=null, clicksaveForPopup=null, onOpenPopup=null){
         
         this.tableid = tableid; //Το id του πίνακα που θα τοποθετηθούν τα δεδομένα
         this.getallUrl = getallUrl; //Το url που θα χρησιμοποιηθεί για να φορτοθούν τα δεδομένα από το endpoint της php
@@ -28,33 +29,37 @@ class TableHandler{
         this.popupwindow = popupwindow;//το id του popup
         this.newbutton = newbutton;//το id του new κουμπιού        
         this.closepopupbutton = closepopupbutton;
-        this.clickrowForPopup = clickrowForPopup;
+        this.clicksaveForPopup = clicksaveForPopup;
+        this.onOpenPopup = onOpenPopup;
         // Get the modal
         var modal = document.getElementById(this.popupwindow);
 
-        // Get the button that opens the modal
-        var btn = document.getElementById(this.newbutton);
+        if(this.newbutton != null){
+            // Get the button that opens the modal
+            this.btn = document.getElementById(this.newbutton);
 
-
-        // Get the <span> element that closes the modal
-        //var span = document.getElementsByClassName("close")[0];
-        var span = document.getElementById(this.closepopupbutton);
+            // When the user clicks the button, open the modal 
+            this.btn.onclick = function() {
+                tablehandler.clearForm();
+                modal.style.display = "block";
+                actionType = "insert";                
+            }
+        }
         
 
-        // When the user clicks the button, open the modal 
-        btn.onclick = function() {
-           tablehandler.clearForm();
-            modal.style.display = "block";
-            actionType = "insert";                
+        if(this.closepopupbutton != null){
+            // Get the <span> element that closes the modal        
+            this.span = document.getElementById(this.closepopupbutton);
+                    
+            // When the user clicks on <span> (x), close the modal
+            this.span.onclick = function() {
+            tablehandler.clearForm();
+                modal.style.display = "none";
+            }
         }
 
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-           tablehandler.clearForm();
-            modal.style.display = "none";
-        }
         //για να πιάνει το escape event
-        document.onkeydown = function(evt) {
+        document.onkeydown = function(evt) {            
             evt = evt || window.event;
             var isEscape = false;
             if ("key" in evt) {
@@ -93,7 +98,9 @@ class TableHandler{
             if (this.readyState == 4 && this.status == 200) {                                
                 var response = eval('(' + this.responseText + ')'); //Στάνταρ λειτουργία για να μετασχηματίσουμε το αποτέλεσμα που παίρνουμε από τον server σε JSON
 
-                self.pupulatedropdowns(response.relations); // Λειτουργία για να ενημερώσουμε τα dropdown του popup μια φορά
+                if(response.relations!= null){
+                    self.pupulatedropdowns(response.relations); // Λειτουργία για να ενημερώσουμε τα dropdown του popup μια φορά
+                }                
                 self.addrows(response.data, self.rows);     // Εισαγωγή των γραμμών - αποτελεσμάτων στον πίνακα           
                 if(callbackfunc!=null){
                     eval(callbackfunc).call();
@@ -122,11 +129,14 @@ class TableHandler{
             tr.appendChild(th); //και το κάνουμε append στο tr την γραμμή
         }
 
-        var th = document.createElement('th');
-            th.innerHTML = "Ενέργημα";
-            tr.appendChild(th);
+        if(this.deleteUrl!=null){
+            var th = document.createElement('th');
+                th.innerHTML = "Ενέργημα";
+                tr.appendChild(th);
+        }
 
-        document.getElementById("tbody").appendChild(tr);
+        //document.getElementById("tbody").appendChild(tr);
+        tabLines.tBodies[0].appendChild(tr);
 
         for (var j = 0; j < data.length; j++) { //Για κάθε εγγραφή μέσα στα δεδομένα που φέραμε σε μορφή json
             var tabLinesRow = tabLines.insertRow(j + 1); //τοποθετούμε μια γραμμή μέσα στον πίνακα
@@ -141,27 +151,35 @@ class TableHandler{
                 }
             }
 
-            var col1 = tabLinesRow.insertCell(cel); //Φτιάχνω ένα κελί για να βάλω το κουμπί
-            var button = document.createElement('button'); //Βάζω το κουμπί
-            button.innerHTML = 'Διαγραφή'; //Φτιάχνω και το όνομα του
-            
-            button.onclick = function(event){ //Δηλώνω το event του πατήματος
-                event.stopPropagation(); //Επειδή έχει και το tr even να ανοίγει το popup όταν πατηθεί και το κουμπί θα εκτελεστεί και το event του τr το onclick. Οπότε σταματάω την μετάδωση του click στο tr με την εντολή αυτή               
-                var id = this.parentElement.parentElement.cells[0].innerHTML; //παίρνω το κωδικό του user
-                //if (window.confirm("Είστε σίγουρος ότι θέλετε να διαγράψετε τον μαθητή?")) { // Τον προϊδοποιώ για την διαγραφή
-                if (window.confirm(self.deleteconfirmmsg)) { // Τον προϊδοποιώ για την διαγραφή                
-                    self.remove(id); //Και διαγράφω τον user στέλνοντας request στον Server.
-                }
-            };
+            if(this.deleteUrl!=null){
+                var col1 = tabLinesRow.insertCell(cel); //Φτιάχνω ένα κελί για να βάλω το κουμπί
+                var button = document.createElement('button'); //Βάζω το κουμπί
+                button.innerHTML = 'Διαγραφή'; //Φτιάχνω και το όνομα του
+                
+                button.onclick = function(event){ //Δηλώνω το event του πατήματος
+                    event.stopPropagation(); //Επειδή έχει και το tr even να ανοίγει το popup όταν πατηθεί και το κουμπί θα εκτελεστεί και το event του τr το onclick. Οπότε σταματάω την μετάδωση του click στο tr με την εντολή αυτή               
+                    var id = this.parentElement.parentElement.cells[0].innerHTML; //παίρνω το κωδικό του user
+                    //if (window.confirm("Είστε σίγουρος ότι θέλετε να διαγράψετε τον μαθητή?")) { // Τον προϊδοποιώ για την διαγραφή
+                    if (window.confirm(self.deleteconfirmmsg)) { // Τον προϊδοποιώ για την διαγραφή                
+                        self.remove(id); //Και διαγράφω τον user στέλνοντας request στον Server.
+                    }
+                };
 
-            col1.appendChild(button);
+                col1.appendChild(button);
+            }            
 
 
             tabLinesRow.addEventListener("click", function(event) { //Για κάθε γραμμή στον πίνακα βάζω ένα event onclick ώστε όταν γίνεται click να ανοίγει ένα popup παράθυρο 
                 var modal = document.getElementById(self.popupwindow); // Παίρνω το όνομα του popup
-                modal.style.display = "block"; //Του αλλάζω στιλ για να το εμφανίσω               
-                self.getItem(this.cells[0].innerHTML); //Παίρνω τον κωδικό της γραμμής ή του στοιχείου που βρίσκεται στην πρώτη στήλη.:ΠΡΟΣΟΧΗ αν δεν είναισ την πρώτη θέση δεν θα παίξει
-                actionType = "update"; //Δηλώνω το acton type. Επειδή χρησιμοποιώ την ίδια φόρμα για το update και το insert για να ξέρω πότε θα γίνει το ένα και πότε το άλλο.
+                modal.style.display = "block"; //Του αλλάζω στιλ για να το εμφανίσω
+                                
+                if(self.getItemUrl!=null){
+                    self.getItem(this.cells[0].innerHTML); //Παίρνω τον κωδικό της γραμμής ή του στοιχείου που βρίσκεται στην πρώτη στήλη.:ΠΡΟΣΟΧΗ αν δεν είναισ την πρώτη θέση δεν θα παίξει
+                    actionType = "update"; //Δηλώνω το acton type. Επειδή χρησιμοποιώ την ίδια φόρμα για το update και το insert για να ξέρω πότε θα γίνει το ένα και πότε το άλλο.
+                }                
+                if(self.onOpenPopup!=null){                                        
+                    self.onOpenPopup(this.cells[0].innerHTML);
+                }                
             });
                 cel = 0; //Και μηδενίζουμε την κολόνα για την επόμενη γραμμή
         }
@@ -170,7 +188,8 @@ class TableHandler{
    
     //Η μέθοδος που τρέχει όταν επιλέξουμε την γραμμή πάνω στον πίνακα. Προφανός παίρνει σαν παράμετρο το id που βρίσκεται τέρμα αριστερά στον πίνακα.
     getItem(id) {
-
+        
+        this.clearForm();
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -182,12 +201,14 @@ class TableHandler{
                 gid=id; //Σετάρω το id ως γενικό global id της φόρμας
                                 
                 //Ο παρακάτω αλγόριθμος είναι αυτό που γεμίζει τα dropdown. Η θεώρηση είναι όταν αν έχω dropdown, μάλλον θα έχω forein key σε κάποιο πίνακα. 
-                //Για αυτό από πριν φρόντίζω από στο μηχανισμό του μοντέλου να φέρω τις αναφορές σε ένα ξεχωριστό αντικείμενο. 
+                //Για αυτό από πριν φρόντίζω από στο μηχανισμό του μοντέλου να φέρω τις αναφορές σε ένα ξεχωριστό αντικείμενο.                 
                 for(var i=0; Object.keys(response).length>i;i++){
+
                    if(document.getElementById(Object.keys(response)[i])!=null){
                         document.getElementById(Object.keys(response)[i]).value = Object.values(response)[i];
-                   }                   
-                }
+                   }
+                                      
+                }                
                 
             }
         };
@@ -231,45 +252,43 @@ class TableHandler{
     //Εκτελέι το update των δεδομένων καλόντας φυσικά το αντίστοιχο method στην php
     update() {
 
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var response = eval('(' + this.responseText + ')');            
-        }
-    };
-    xhttp.open("POST", this.updateUrl, true);
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var response = eval('(' + this.responseText + ')');            
+            }
+        };
+        xhttp.open("POST", this.updateUrl, true);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
 
-    //Ο παρακάτω κώδικας απλά συλλέγει τα δεδομένα από την φόρμα. Είναι μια αυτοματοποιημένη διαδικασία συλλογής δεδομένων από την φόρμα. 
-    //Ο λόγος που επιλέχτηκε να είναι αυτοματοποιημένη είναι επειδή είχα την έμπνευση να χρησιμοποιήσω τον κώδικα αυτόν σε παραγωγικό περιβάλον.
-    var data = {};
-    data['id'] = gid;
-    var formitems = document.getElementById(this.popupwindow).getElementsByTagName("input");        
-    
-    //Παίρνει όλα τα elements που είναι image, text ή password. Προφανός για την εργασία μας το image δεν χρειάζεται
-    for(var i=0; i<formitems.length;i++){
-        if(formitems[i].tagName == "image" || formitems[i].getAttribute("type") == "text" || formitems[i].getAttribute("type") == "password"){ 
-            eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");                
-        }
-    }
-
-    //Παίρνει όλα τα option select
-    formitems = document.getElementById(this.popupwindow).getElementsByTagName("select");        
-    for(var i=0; i<formitems.length;i++){            
-            eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");
-            
+        //Ο παρακάτω κώδικας απλά συλλέγει τα δεδομένα από την φόρμα. Είναι μια αυτοματοποιημένη διαδικασία συλλογής δεδομένων από την φόρμα. 
+        //Ο λόγος που επιλέχτηκε να είναι αυτοματοποιημένη είναι επειδή είχα την έμπνευση να χρησιμοποιήσω τον κώδικα αυτόν σε παραγωγικό περιβάλον.
+        var data = {};
+        data['id'] = gid;
+        var formitems = document.getElementById(this.popupwindow).getElementsByTagName("input");        
         
-    }
+        //Παίρνει όλα τα elements που είναι image, text ή password. Προφανός για την εργασία μας το image δεν χρειάζεται αλλά το φτιάχνω γενικά
+        for(var i=0; i<formitems.length;i++){
+            if(formitems[i].tagName == "image" || formitems[i].getAttribute("type") == "text" || formitems[i].getAttribute("type") == "password"){ 
+                eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");                
+            }
+        }
 
-    //Τέλος παίρνει τα textareas αν υπάρχουν
-    formitems = document.getElementById(this.popupwindow).getElementsByTagName("textarea");        
-    for(var i=0; i<formitems.length;i++){            
-            eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");                            
-    }        
-    
-    //Τα παραπάνω δεδομένα τα μαζεύω σε ένα json αρχείο και τα στέλνω στον controller για να τα κάνει update.
-    xhttp.send(JSON.stringify(data));
+        //Παίρνει όλα τα option select
+        formitems = document.getElementById(this.popupwindow).getElementsByTagName("select");
+        for(var i=0; i<formitems.length;i++){
+                eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");                    
+        }
+
+        //Τέλος παίρνει τα textareas αν υπάρχουν
+        formitems = document.getElementById(this.popupwindow).getElementsByTagName("textarea");        
+        for(var i=0; i<formitems.length;i++){
+                eval("data['"+formitems[i].id + "'] = '" + formitems[i].value + "'");                    
+        }        
+        
+        //Τα παραπάνω δεδομένα τα μαζεύω σε ένα json αρχείο και τα στέλνω στον controller για να τα κάνει update.
+        xhttp.send(JSON.stringify(data));
     }
 
     //Ίδια λειτουργία με το update απλά δεν στένω το id στο endpoint γιατί είναι απλά ένα insert
@@ -335,8 +354,8 @@ class TableHandler{
 
     //Ένας μηχανίσμός για να ελέγχουμε πότε κάνουμε update και πότε insert κάτω από το ίδιο κουμπί
     save() {
-        //{canSubmit : canSubmit, fields : errorFields};
-        if(this.clickrowForPopup.call().canSubmit){
+        //{canSubmit : canSubmit, fields : errorFields};        
+        if(this.clicksaveForPopup.call().canSubmit){
             if (actionType == "update") {         
                 tablehandler.update();
                 tablehandler.loadtable(); 
@@ -355,14 +374,18 @@ class TableHandler{
     //Όταν εκτελείται για πρώτη φορά η loadtable θα φορτώσει τον πίνακα. Επειδή όμως χρησιμοποιώ και μια φόρμα για κάθε ένα click που γίνεται χρησιμοποιώ έναν μηχανισμό για να ξέρω
     //ποιο/ποια είναι το/τα forein key στον πίνακα ώστε να χειριστώ τα dropdown lists. Πχ οι users θα έχουν το dropdown του ρόλου. 
     //Γίνεται η χρήση της Object.keys και Object.values για να επιλέξω τα key και values του json που επιστρέφω. 
-    pupulatedropdowns(relations){
-                
+    pupulatedropdowns(relations){         
         for(var i=0;i<Object.keys(relations).length;i++){            
             var lblitems = document.getElementById(Object.keys(relations)[i]);
 
-             for(var j=0;j<Object.values(relations)[i][0].length;j++){                 
-                 lblitems.options[lblitems.options.length] = new Option(Object.values(relations)[i][0][j].name, Object.values(relations)[i][0][j].id);
-             }
+            //Καθάρισε τα dropdown list
+            while(lblitems.options.length) {
+                lblitems.remove(0);
+            }
+
+            for(var j=0;j<Object.values(relations)[i][0].length;j++){                 
+                lblitems.options[lblitems.options.length] = new Option(Object.values(relations)[i][0][j].name, Object.values(relations)[i][0][j].id);
+            }
         }
         
 

@@ -11,24 +11,22 @@ class methods
     } 
 
 
-    public function getentrolements()
+    public function getStatisticData()
     {
         $obj = new Studentprogress();
-        $data = $obj->getentrolements();
+        $data[] = $obj->getEnrolledCourses();
+        $data[] = $obj->getBasicEnrolledCoursesWithPassGrade();
+        $data[] = $obj->getOptionalEnrolledCoursesWithPassGrade();        
+        $data[] = $obj->getBasicCoursesforDegree();
+        $data[] = $obj->getOptionCoursesforDegree();
+        $data[] = $obj->getEctsforgraduation();
+        $data[] = $obj->getEctsgathered();
+        
         responseHandler::respond($data);
+        
     } 
 
-    public function remainingenrolements()
-    {
-        $obj = new Studentprogress();
-        $data = $obj->remainingenrolements();
-        responseHandler::respond($data);
-    } 
 
-
-    
-
-    
 
     
 }

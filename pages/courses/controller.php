@@ -9,6 +9,7 @@ include_once "models/courses.php";
     {
         $obj = new Courses();
         $data = $obj->select();
+        $data['relations'] = $obj->getRelations();    
         responseHandler::respond($data);
 
     }

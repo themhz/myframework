@@ -101,7 +101,7 @@
                      formValidator =  new FrormValidator(fields);
                      return formValidator.validate();
             };              
-            tablehandler = new TableHandler(tableid, getAllUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clickrowForPopup);
+            tablehandler = new TableHandler(tableid, getAllUrl, rows, getItemUrl, deleteUrl, updateUrl, insertUrl, deleteconfirmmsg, popupwindow, newbutton, closepopupbutton, clickrowForPopup, null);
             tablehandler.loadtable();            
 
         }
