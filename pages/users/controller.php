@@ -1,6 +1,7 @@
 <?php
 include_once "models/users.php";
 include_once "models/role.php";
+include_once "models/semester.php";
 
 class methods
 {
@@ -36,9 +37,16 @@ class methods
 
         if(requestHandler::get()!=null){
             $posts = requestHandler::get();
+        }        
+        $data = $obj->update($posts);                
+
+        $semester = new Semester();
+        $doinsert = $semester->checkIfExists($posts);
+        
+        if($doinsert==true){            
+            $semester->insert($posts);
         }
-        //print_r($posts);
-        $data = $obj->update($posts);
+
         responseHandler::respond($data);
     }
 
@@ -48,6 +56,12 @@ class methods
 
         if(requestHandler::get()!=null){
             $posts = requestHandler::get();
+        }
+
+        $semester = new Semester();
+        $exists = $semester->checkIfExists($posts);
+        if(!$exists){
+            $semester->insert($posts);
         }
 
         $data = $obj->insert($posts);
@@ -63,6 +77,13 @@ class methods
         }
                 
         $data = $obj->delete($posts->id);
+        responseHandler::respond($data);
+    }
+
+
+    public function getcurrentsemester(){
+        $obj = new Semester();
+        $data = $obj->getUserSemester();
         responseHandler::respond($data);
     }
 

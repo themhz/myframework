@@ -31,6 +31,7 @@ class TableHandler{
         this.closepopupbutton = closepopupbutton;
         this.clicksaveForPopup = clicksaveForPopup;
         this.onOpenPopup = onOpenPopup;
+        this.selectedrows = null;
         // Get the modal
         var modal = document.getElementById(this.popupwindow);
 
@@ -176,10 +177,12 @@ class TableHandler{
                 if(self.getItemUrl!=null){
                     self.getItem(this.cells[0].innerHTML); //Παίρνω τον κωδικό της γραμμής ή του στοιχείου που βρίσκεται στην πρώτη στήλη.:ΠΡΟΣΟΧΗ αν δεν είναισ την πρώτη θέση δεν θα παίξει
                     actionType = "update"; //Δηλώνω το acton type. Επειδή χρησιμοποιώ την ίδια φόρμα για το update και το insert για να ξέρω πότε θα γίνει το ένα και πότε το άλλο.
-                }                
-                if(self.onOpenPopup!=null){                                        
-                    self.onOpenPopup(this.cells[0].innerHTML);
-                }                
+                }
+
+                self.selectedrows = this.cells;
+                if(self.onOpenPopup!=null){
+                    self.onOpenPopup(self.selectedrows[0].innerHTML, self);
+                }  
             });
                 cel = 0; //Και μηδενίζουμε την κολόνα για την επόμενη γραμμή
         }
@@ -191,11 +194,12 @@ class TableHandler{
         
         this.clearForm();
         var xhttp = new XMLHttpRequest();
+        var self = this;
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                var response = eval('(' + this.responseText + ')');
-
+                var response = eval('(' + this.responseText + ')');                
                 response = response.data[0]; //παίρνω τα δεδομένα του πεδίου
+                //self.selectedItemResponse =
                 self.editrows = response; //παίρνω τις σχέσεις που υπάρχουν. Δηλαδή τα τυχών constrains για να κάνω populate τον dropdown box της φόρμας σε όσα υπάρχει. 
                 //Φυσικά η φόρμα πρέπει να τα περιλαμβάνει αυτά τα πεδία
                 gid=id; //Σετάρω το id ως γενικό global id της φόρμας
@@ -209,6 +213,10 @@ class TableHandler{
                    }
                                       
                 }                
+
+                if(self.onOpenPopup!=null){
+                    self.onOpenPopup(self.selectedrows[0].innerHTML, self);
+                }  
                 
             }
         };
@@ -334,21 +342,28 @@ class TableHandler{
     var formitems = document.getElementById(this.popupwindow).getElementsByTagName("input");      
     //get all inputs
     for(var i=0; i<formitems.length;i++){
-        if(formitems[i].type!="button"){
-            formitems[i].value = "";
+        if(formitems[i].getAttribute("data-custom")!="true"){
+            if(formitems[i].type!="button"){
+                formitems[i].value = "";
+            }
         }
     }
 
     //get all selects
-    formitems = document.getElementById(this.popupwindow).getElementsByTagName("select");        
-    for(var i=0; i<formitems.length;i++){            
-        formitems[i].value = "";
+    formitems = document.getElementById(this.popupwindow).getElementsByTagName("select");            
+    
+    for(var i=0; i<formitems.length;i++){
+        if(formitems[i].getAttribute("data-custom")!="true"){
+            formitems[i].value = "";        
+        }
     }
 
     //get all textareas
     formitems = document.getElementById(this.popupwindow).getElementsByTagName("textarea");        
     for(var i=0; i<formitems.length;i++){            
-        formitems[i].value = "";
+        if(formitems[i].getAttribute("data-custom")!="true"){
+            formitems[i].value = "";
+        }
     }        
     }
 
@@ -375,7 +390,7 @@ class TableHandler{
     //ποιο/ποια είναι το/τα forein key στον πίνακα ώστε να χειριστώ τα dropdown lists. Πχ οι users θα έχουν το dropdown του ρόλου. 
     //Γίνεται η χρήση της Object.keys και Object.values για να επιλέξω τα key και values του json που επιστρέφω. 
     pupulatedropdowns(relations){         
-        for(var i=0;i<Object.keys(relations).length;i++){            
+        for(var i=0;i<Object.keys(relations).length;i++){
             var lblitems = document.getElementById(Object.keys(relations)[i]);
 
             //Καθάρισε τα dropdown list
@@ -386,14 +401,8 @@ class TableHandler{
             for(var j=0;j<Object.values(relations)[i][0].length;j++){                 
                 lblitems.options[lblitems.options.length] = new Option(Object.values(relations)[i][0][j].name, Object.values(relations)[i][0][j].id);
             }
-        }
-        
-
+        }        
     }
-
-
-
-
 }
 
 
