@@ -32,7 +32,7 @@
             </tr>
             <tr>
                <td>Ρόλος</td>
-               <td><select id="role"></select></td>
+               <td><select id="role" onchange="checkrolesemester()"></select></td>
             </tr>
             <tr id="fieldsemester">
                <td>Εξάμηνο</td>
@@ -82,8 +82,9 @@
    var gid;         
    var tablehandler;
 
-   document.addEventListener('readystatechange', function(evt) {
-        if(evt.target.readyState == "complete"){                           
+   document.addEventListener('readystatechange', function(evt) {      
+        if(evt.target.readyState == "complete"){                
+            document.getElementById("fieldsemester").style.display="none";           
             var tableid = "table";
             var getAllUrl = "/myframework/users/getusers?format=raw";
             var rows = ["id", "name", "email", "rolename", "regdate", "am"];
@@ -142,6 +143,14 @@
         
         xhttp.send(JSON.stringify({'id':id})); //Τελική αποστολή των δεδομένων στο endpoint. μετά από εδώ ο κώδικας θα μεταφερθεί στην γραμμή 51 που είναι το promise. Δηλαδή μόλις ολοκληρωθεί
 
+    }
+
+    function checkrolesemester(){
+         if(document.getElementById("role").value == 3){
+            document.getElementById("fieldsemester").style.display="";
+         }else{
+            document.getElementById("fieldsemester").style.display="none";
+         }
     }
      
 </script>

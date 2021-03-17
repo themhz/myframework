@@ -32,8 +32,13 @@
                 </div>
                 <!--το Λινκ της εισόδου-->
                 <div class="headr">
-                    <a id="login" href="login">Είσοδος</a>
-                </div>
+                <?php if (isset($_SESSION["user"])){ ?>
+                    <a id="logout" href="login?method=logout&format=raw">Έξοδος</a>                
+                <?php } ?>
+                    
+                    
+                </form>
+                </div>                
             </div>
         </div>
         <!--Εδώ έχουμε τον placeholder για το menu-->
@@ -42,9 +47,11 @@
         </div>
         <nav id="nav2" class="nav2">
             <ul>
+            <?php if ($_SESSION["user"][0]->role == 1){ ?>
                 <li id="listusers"><a href="users">Διαχείριση Χρηστών</a></li>
                 <li id="listcourses"><a href="courses">Διαχείριση Μαθημάτων</a></li>
                 <li id="liststudentprogress"><a href="studentprogress">Πρόοδος Φοιτητών</a></li>
+            <?php } ?>
             </ul>
         </nav>
         <!--Εδώ έχουμε το κυρίως σώμα της σελίδας με τις ανακοινώσεις αριστερά και δεξιά

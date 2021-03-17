@@ -33,11 +33,9 @@
             var response = eval('(' + this.responseText + ')');
             if(response=="nouser"){
                alert("Λάθος username ή password")   
-            }else{
-               response = response.data[0];
-               //console.log(response.id);
-               //console.log(response.email);
-               //console.log(response.password);
+            }else{               
+               window.location.replace("default");
+
             }
             
             

@@ -40,12 +40,13 @@ class methods
         }        
         $data = $obj->update($posts);                
 
-        $semester = new Semester();
-        $doinsert = $semester->checkIfExists($posts);
-        
-        if($doinsert==true){            
-            $semester->insert($posts);
-        }
+        if($posts->role==3){
+            $semester = new Semester();
+            $doinsert = $semester->checkIfExists($posts);        
+            if($doinsert==true){
+                $semester->insert($posts);
+            }
+        }        
 
         responseHandler::respond($data);
     }
@@ -56,12 +57,14 @@ class methods
 
         if(requestHandler::get()!=null){
             $posts = requestHandler::get();
-        }
-
-        $semester = new Semester();
-        $exists = $semester->checkIfExists($posts);
-        if(!$exists){
-            $semester->insert($posts);
+        }                
+        
+        if($posts->role==3){
+            $semester = new Semester();
+            $doinsert = $semester->checkIfExists($posts);
+            if($doinsert){
+                $semester->insert($posts);
+            }            
         }
 
         $data = $obj->insert($posts);

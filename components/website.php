@@ -49,11 +49,7 @@ class Website{
         
         //Load controler
         include __DIR__.'/controller.php';       
-        
-        // if(!isset($_SESSION["user"])){
-
-        // }
-       
+                 
         $raw = isset($_REQUEST['format']) ? $_REQUEST['format'] : '';        
         if($raw != 'raw'){
             //Load template            
