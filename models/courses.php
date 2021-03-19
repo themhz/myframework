@@ -196,5 +196,37 @@ class Courses
 
         return $data;
     }
+
+
+    public function selectStudentCourses()
+    {
+
+        $requesthandler =  new requesthandler();
+        $db = dbhandler::getInstance();
+        $id = requestHandler::get()->id;
+
+        $sql = "select a.*, b.name, b.lastname from courses a
+                    inner join users b on b.id = a.users
+                    where a.users = $id;
+        ";
+                
+                                
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($results as $row) {
+            $data['data'][] = array(
+                'id' => $row->id,                
+                'title' => $row->title,
+                'description' => $row->description,                
+                'courses_type' => $row->courses_type,
+                'semester' => $row->semester,
+                'ects' => $row->ects                
+            );
+        }
+
+        return $data;
+    }    
     
 }

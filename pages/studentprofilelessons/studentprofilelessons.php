@@ -68,7 +68,7 @@ document.addEventListener('readystatechange', function(evt) {
                 createTable("lessons", results);
             }
         };
-        xhttp.open("POST", "/myframework/profilelessons/getlessons?format=raw", true);
+        xhttp.open("POST", "/myframework/studentprofilelessons/getlessons?format=raw", true);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         //xhttp.send();   
         xhttp.send(JSON.stringify({"id": <?php echo $_SESSION["user"][0]->id; ?> }));   
@@ -179,7 +179,7 @@ function createTable(id, values){
                 location.reload();
             }
         };
-        xhttp.open("POST", "/myframework/profilelessons/enrollcorse?format=raw", true);
+        xhttp.open("POST", "/myframework/studentprofilelessons/enrollcorse?format=raw", true);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");        
         xhttp.send(JSON.stringify({"users": <?php echo $_SESSION["user"][0]->id; ?> , "courses" : courses}));   
     }
@@ -193,7 +193,7 @@ function createTable(id, values){
                 location.reload();
             }
         };
-        xhttp.open("POST", "/myframework/profilelessons/abandonecorse?format=raw", true);
+        xhttp.open("POST", "/myframework/studentprofilelessons/abandonecorse?format=raw", true);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");        
         xhttp.send(JSON.stringify({"users": <?php echo $_SESSION["user"][0]->id; ?> , "courses" : courses}));   
     }

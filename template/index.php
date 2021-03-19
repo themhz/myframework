@@ -56,10 +56,11 @@
             <?php } ?>
             <?php if ($_SESSION["user"][0]->role == 2){ ?>
                 <li id="listprofile"><a href="profile">Διαχείριση Profile</a></li>
+                <li id="listprofessorprofilelessons"><a href="professorprofilelessons">Διαχείριση Μαθημάτων</a></li>
             <?php } ?>
             <?php if ($_SESSION["user"][0]->role == 3){ ?>
                 <li id="listprofile"><a href="profile">Διαχείριση Profile</a></li>
-                <li id="listprofilelessons"><a href="profilelessons">Διαχείριση Μαθημάτων</a></li>
+                <li id="liststudentprofilelessons"><a href="studentprofilelessons">Διαχείριση Μαθημάτων</a></li>
             <?php } ?>
             </ul>
         </nav>

@@ -661,3 +661,100 @@ align-items: center;
   .table td{      
       border:1px solid black;
   }
+
+
+  #professorlessons {
+    /* width: 98vw; */
+    margin-top: 20;
+    margin-bottom: 30px;
+    grid-area: body;
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr /* minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 0.5fr) minmax(50px, 1fr) */;
+}    
+#professorlessons thead, #professorlessons tbody, #professorlessons tr {
+    display: contents;
+    border:1px solid black;  
+      
+    color: blue!important;
+  }
+  
+  #professorlessons th {
+      
+    padding: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border:1px solid black;
+    z-index: 0;
+    position: sticky;
+    top: 0;
+    background:grey;
+    text-align: center;
+    font-weight: normal; 
+    font-size: 1.1rem;
+    color: white;
+    border: 1px solid black;
+  }
+  
+  #professorlessons td{
+    padding: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border:1px solid black;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color:#CE0980;
+  }   
+
+
+  /****************************************/
+
+
+  #enroledusers {
+    /* width: 98vw; */
+    margin-top: 20;
+    margin-bottom: 30px;
+    grid-area: body;
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    grid-template-columns: 1fr 1fr 1fr  /* minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 1fr) minmax(50px, 0.5fr) minmax(50px, 1fr) */;
+}    
+#enroledusers thead, #enroledusers tbody, #enroledusers tr {
+    display: contents;
+    border:1px solid black;  
+      
+    color: blue!important;
+  }
+  
+  #enroledusers th {
+      
+    padding: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border:1px solid black;
+    z-index: 0;
+    position: sticky;
+    top: 0;
+    background:grey;
+    text-align: center;
+    font-weight: normal; 
+    font-size: 1.1rem;
+    color: white;
+    border: 1px solid black;
+  }
+  
+  #enroledusers td{
+    padding: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border:1px solid black;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color:#CE0980;
+  }   

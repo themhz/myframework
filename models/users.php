@@ -238,7 +238,7 @@ class Users
         $sql = "select a.*, b.name rolename,max(semester) semester
                     from users a
                     inner join role b on a.role = b.id        
-                    inner join semester c on c.users = a.id            
+                    left join semester c on c.users = a.id            
                     ";                                        
         
         $username = null;
@@ -252,7 +252,7 @@ class Users
         }
         
         $sql .= " where a.email = '".$username."' and a.password='".$password."'";
-
+        
         
         $sth = $db->dbh->prepare($sql);
         $sth->execute();

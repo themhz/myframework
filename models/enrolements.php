@@ -93,5 +93,53 @@ class Enrolements
 
         return $courses;
     }
+
+
+    public function getenroledstudents(){
+        $requesthandler =  new requesthandler();
+        $db = dbhandler::getInstance();
+        $id = requestHandler::get()->id;
+
+        $sql = "select a.*,  b.name, b.lastname
+                from enrolements a
+                inner join users b on a.users = b.id
+                where a.courses = $id;";
+                
+                                
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($results as $row) {
+            $data['data'][] = array(
+                'id' => $row->id,                
+                'users' => $row->users,
+                'name' => $row->name,
+                'lastname' => $row->lastname,
+                'grade' => $row->grade
+            );
+        }
+
+        return $data;
+    }
+
+    public function updategrade(){
+        $db = dbhandler::getInstance();
+        $enroled_id = requestHandler::get()->enroled_id;        
+        $grade = requestHandler::get()->grade;
+
+        $sql = "update enrolements "
+            . " set grade = $grade where  id = $enroled_id";
+                        
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute();
+
+        $rowsupdates = $sth->rowCount();
+        if($rowsupdates == 0){
+            return array('update'=>false, "records"=>$rowsupdates);
+        }else{
+            return array('update'=>true, "records"=>$rowsupdates);
+        }
+    }
     
 }
