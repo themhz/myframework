@@ -423,24 +423,24 @@ class FrormValidator{
 
             switch(this.fields[i].type) {
                 case "textbox":
-                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                    if(this.fields[i].required && (document.getElementById(this.fields[i].id).value == "" || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
                     }else{
                         document.getElementById(this.fields[i].id).style = "background-color:none;";
                     }
                     break;
-                case "password":
-                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                case "password":                    
+                    if(this.fields[i].required && (document.getElementById(this.fields[i].id).value == "" || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
                     }else{
                         document.getElementById(this.fields[i].id).style = "background-color:none;";
+                        
                     }
-                  console.log("password");
                     break;
                 case "textarea":
-                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                    if(this.fields[i].required && (document.getElementById(this.fields[i].id).value == "" || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
                     }else{
@@ -448,11 +448,10 @@ class FrormValidator{
                     }
                     break;
                 case "date":
-                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                    if(this.fields[i].required && (document.getElementById(this.fields[i].id).value == "" || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
                     }else{
-                        //check if its in date format ????ΕΔΩ ΕΙΜΑΣΤΕ
                         document.getElementById(this.fields[i].id).style = "background-color:none;";
                     }
                     break;
@@ -475,19 +474,17 @@ class FrormValidator{
                     // code block
                     break;
                 case "select":
-                    if(this.fields[i].required && document.getElementById(this.fields[i].id).value == ""){
+                    if(this.fields[i].required && (document.getElementById(this.fields[i].id).value == "" || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
-                    }else{
-                        //check if its in date format ????ΕΔΩ ΕΙΜΑΣΤΕ
+                    }else{                        
                         document.getElementById(this.fields[i].id).style = "background-color:none;";
                     }
                     break;
-                case "multiselect":
-                    // code block
+                case "multiselect":                    
                     break;
                 case "email":
-                    if(this.fields[i].required && !this.isemail(document.getElementById(this.fields[i].id).value)){
+                    if(this.fields[i].required && (!this.isemail(document.getElementById(this.fields[i].id).value) || this.checkLength(this.fields[i]))){
                         document.getElementById(this.fields[i].id).style = "background-color:red";
                         errorFields[this.fields[i].id] = this.fields[i].id + " is required";
                     }else{                        
@@ -496,7 +493,15 @@ class FrormValidator{
 
                     break;
                 case "phone":
-                    // code block
+                    if (this.fields[i].required && !this.isphonenumber(document.getElementById(this.fields[i].id).value)) {
+                        errorFields[this.fields[i].id] = { result: "error" };
+                        document.getElementById(this.fields[i].id).style = "background-color:red";
+                    } else if (!this.fields[i].required && !this.isempty(document.getElementById(this.fields[i].id).value) && !this.isphonenumber(document.getElementById(this.fields[i].id).value)) {
+                        errorFields[this.fields[i].id] = { result: "error" };
+                        document.getElementById(this.fields[i].id).style = "background-color:red";
+                    }else {
+                        document.getElementById(this.fields[i].id).style = "background-color:white";                        
+                    }
                     break;         
                 default:
                   // code block
@@ -511,13 +516,87 @@ class FrormValidator{
         return {canSubmit : canSubmit, fields : errorFields};
     }
 
-    isemail(x) 
-    {
-        if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(x))
-        {
-            return (true)
+    isemail(x) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if (re.test(String(x).toLowerCase())) {
+            return true;
         }
-        //alert("You have entered an invalid email address!")
-        return (false)
+
+        return false;
+    }
+
+    checkLength(x){
+        
+        if(x.hasOwnProperty('size')){
+            
+            //alert(x.size.test)
+            //alert(document.getElementById(x.id).value.length)
+            var xsizetest = x.size.test;
+            var xsizelen = parseInt(x.size.len);
+            var valuelength = document.getElementById(x.id).value.length;
+
+            //alert(xsizelen + xsizetest + valuelength)
+            switch(xsizetest){
+                case ">":                    
+                    if(xsizelen>valuelength){
+                        return false;
+                    }
+                    break;
+                case "<":                    
+                    if(xsizelen<valuelength){
+                        return false;
+                    }
+                    break;
+                case "=":                    
+                    if(xsizelen==valuelength){                        
+                        return false;
+                    }
+                    break;
+                case ">=":
+                if(xsizelen>=valuelength){
+                    return false;
+                }
+                    break;
+                case "<=":
+                if(xsizelen<=valuelength){
+                    return false;
+                }
+                    break;
+                default:                    
+                    return true;
+            }
+
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    isphonenumber(x) {           
+        
+        var numbers = /^[0-9]+$/;
+        if (x.match(numbers) && x.length=="10") {            
+            return true;
+        }
+
+        return false;
+
+    }
+
+    isempty(x) {
+
+        if (x.replace(/\s/g, "").length == 0) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+
+class FormHandler{
+    constructor(fields){ 
+        this.fields = fields;
     }
 }

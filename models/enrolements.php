@@ -12,15 +12,15 @@ class Enrolements
     {
         $db = dbhandler::getInstance();
         $sql = "insert enrolements "
-            . "( user_id,course_id,status,grade,regdate) "
-            . " values(:user_id,:course_id,:status,:grade,:regdate); ";
+            . "(users,courses,status,grade,regdate) "
+            . " values(:users,:courses,:status,:grade,:regdate); ";
 
         $values = array();
-        $values[":user_id"] = $obj->user_id;
-	$values[":course_id"] = $obj->course_id;
-	$values[":status"] = $obj->status;
-	$values[":grade"] = $obj->grade;
-	$values[":regdate"] = date("Y-m-d H:i:s");
+        $values[":users"] = $obj->users;
+	    $values[":courses"] = $obj->courses;
+	    $values[":status"] = 1;
+	    $values[":grade"] = 0;
+	    $values[":regdate"] = date("Y-m-d H:i:s");
 	
         
         $sth = $db->dbh->prepare($sql);
@@ -51,8 +51,8 @@ class Enrolements
         foreach ($results as $row) {
             $data['data'][] = array(
                 'id' => $row->id
-		,'user_id' => $row->user_id
-		,'course_id' => $row->course_id
+		,'users' => $row->users
+		,'courses' => $row->courses
 		,'status' => $row->status
 		,'grade' => $row->grade
 		,'regdate' => $row->regdate
@@ -65,37 +65,33 @@ class Enrolements
     }
 
 
-    public function delete($id)
+    public function delete($obj)
     {
         $db = dbhandler::getInstance();
-        $sql = "delete from enrolements where id = $id";
+        $sql = "delete from enrolements where users = ".$obj->users." and courses = ".$obj->courses;
         $sth = $db->dbh->prepare($sql);
         $sth->execute();
         return 'ok';
-    }
+    } 
 
-    public function update($obj)
-    {
+
+    public function checkuserenrolement($obj){        
+
+        $requesthandler =  new requesthandler();
+
         $db = dbhandler::getInstance();
-        $sql = "update enrolements "
-            . " set user_id=:user_id,course_id=:course_id,status=:status,grade=:grade,regdate=:regdate ";                
-
-
-        $sql .= " where id=:id";
-        
-        $values = array();
-        $values[":user_id"] = $obj->user_id;
-	$values[":course_id"] = $obj->course_id;
-	$values[":status"] = $obj->status;
-	$values[":grade"] = $obj->grade;
-	$values[":regdate"] = $obj->regdate;
-	
-
-
-        $values[":id"] = $obj->id;
-        
+        $sql = "select courses from enrolements where users = ".$obj->users." and courses = ".$obj->courses;
+                                         
         $sth = $db->dbh->prepare($sql);
-        $sth->execute($values);
-    }    
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_OBJ);
+        
+        $courses = null;
+        foreach ($results as $row) {            
+                $courses = $row->courses;
+        }
+
+        return $courses;
+    }
     
 }

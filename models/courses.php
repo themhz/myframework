@@ -146,5 +146,55 @@ class Courses
 
         return $data;
     }
+
+    public function selectwithStudentGrade()
+    {
+
+        $requesthandler =  new requesthandler();
+        $db = dbhandler::getInstance();
+        $id = requestHandler::get()->id;
+
+        $sql = "select a.id, 
+                        a.title, 
+                        a.description, 
+                        c.name as 'type', 
+                        c.id as 'courses_type', 
+                        a.semester, a.ects, 
+                        Concat(b.name ,\" \", b.lastname) as professorname, 
+                        b.id as users,
+                        d.grade,
+                        d.status,
+                        e.name statusname
+                    from courses a 
+                    inner join users b on a.users = b.id 
+                    inner join courses_type c on a.courses_type = c.id 
+                    left join enrolements d on d.courses = a.id and d.users = $id
+                    left join status e on e.id = d.status
+                    order by a.id";
+                
+                                
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($results as $row) {
+            $data['data'][] = array(
+                'id' => $row->id,
+                'title' => $row->title,
+                'description' => $row->description,
+                'type' => $row->type,
+                'courses_type' => $row->courses_type,
+                'semester' => $row->semester,
+                'ects' => $row->ects,
+                'professorname' => $row->professorname,
+                'users' => $row->users,
+                'grade' => $row->grade,
+                'status' => $row->status,
+                'statusname' => $row->statusname
+            );
+        }
+
+        return $data;
+    }
     
 }

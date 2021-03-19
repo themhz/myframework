@@ -41,10 +41,12 @@
                 </div>                
             </div>
         </div>
-        <!--Εδώ έχουμε τον placeholder για το menu-->
+        <!--Εδώ έχουμε οριζόντιο placeholder για το menu-->
         <div class="nav">
             &nbsp;
         </div>
+        <!--Εδώ έχουμε κάθετο placeholder για το menu-->
+        <?php if (isset($_SESSION["user"])) {?>
         <nav id="nav2" class="nav2">
             <ul>
             <?php if ($_SESSION["user"][0]->role == 1){ ?>
@@ -52,8 +54,16 @@
                 <li id="listcourses"><a href="courses">Διαχείριση Μαθημάτων</a></li>
                 <li id="liststudentprogress"><a href="studentprogress">Πρόοδος Φοιτητών</a></li>
             <?php } ?>
+            <?php if ($_SESSION["user"][0]->role == 2){ ?>
+                <li id="listprofile"><a href="profile">Διαχείριση Profile</a></li>
+            <?php } ?>
+            <?php if ($_SESSION["user"][0]->role == 3){ ?>
+                <li id="listprofile"><a href="profile">Διαχείριση Profile</a></li>
+                <li id="listprofilelessons"><a href="profilelessons">Διαχείριση Μαθημάτων</a></li>
+            <?php } ?>
             </ul>
         </nav>
+        <?php }?>
         <!--Εδώ έχουμε το κυρίως σώμα της σελίδας με τις ανακοινώσεις αριστερά και δεξιά
             επίσης κάθε ανακοίνωση ανα μια αλλάζει η κλάση της ώστε να πετύχουμε την διαφοροποίηση αριστερά δεξιά-->
         <div class="body">

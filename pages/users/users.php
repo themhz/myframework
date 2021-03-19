@@ -65,7 +65,7 @@
             </tr>
             <tr>
                <td></td>
-               <td><input type="button" value="save" onclick="tablehandler.save()"><button onclick = "formValidator.validate()">validate</button></td>
+               <td><input type="button" value="save" onclick="tablehandler.save()"></td>
             </tr>
          </table>
       </div>

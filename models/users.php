@@ -235,8 +235,10 @@ class Users
         
 
         $db = dbhandler::getInstance();
-        $sql = "select a.*, b.name rolename from users a
-                    inner join role b on a.role = b.id                    
+        $sql = "select a.*, b.name rolename,max(semester) semester
+                    from users a
+                    inner join role b on a.role = b.id        
+                    inner join semester c on c.users = a.id            
                     ";                                        
         
         $username = null;
@@ -248,16 +250,16 @@ class Users
         if(isset(requestHandler::get()->password)){
             $password = requestHandler::get()->password;
         }
-                            
+        
         $sql .= " where a.email = '".$username."' and a.password='".$password."'";
 
         
         $sth = $db->dbh->prepare($sql);
         $sth->execute();
         $results = $sth->fetchAll(PDO::FETCH_OBJ);
-                
+            
         
-        if(count($results)>0){
+        if($results[0]->id!=""){
             $_SESSION["user"] = $results;
             foreach ($results as $row) {
                 $data['data'][] = array(
@@ -272,7 +274,8 @@ class Users
                     'birthdate' => $row->birthdate,
                     'regdate' => $row->regdate,
                     'am' => $row->am,
-                    'rolename' => $row->rolename
+                    'rolename' => $row->rolename, 
+                    'semester' => $row->semester, 
     
                 );
             }
@@ -312,6 +315,49 @@ class Users
         }
 
         return $data;
+    }
+
+    public function updateProfile($obj){
+        $db = dbhandler::getInstance();
+        $sql = "update users "
+            . " set mobilephone=:mobilephone, address=:address";
+        
+
+        if(isset($obj->birthdate) && trim($obj->birthdate)!=""){
+            $sql .= ",birthdate=:birthdate ";
+        }
+
+        if(isset($obj->password) && trim($obj->password)!=""){
+            $sql .= ", password=:password ";
+        }
+
+        $sql .= " where id=:id";
+        
+        $values = array();
+        
+        if(isset($obj->password) && trim($obj->password)!=""){
+            $values[":password"] = $obj->password;
+        }
+        
+        $values[":mobilephone"] = $obj->mobilephone;
+        $values[":address"] = $obj->address;
+
+        if(isset($obj->birthdate) && trim($obj->birthdate)!=""){
+            $values[":birthdate"] = $obj->birthdate;
+        }        
+    
+        $values[":id"] = $obj->id;
+        
+
+        $sth = $db->dbh->prepare($sql);
+        $sth->execute($values);
+
+        $rowsupdates = $sth->rowCount();
+        if($rowsupdates == 0){
+            return array('update'=>false, "records"=>$rowsupdates);
+        }else{
+            return array('update'=>true, "records"=>$rowsupdates);
+        }
     }
     
 }
